@@ -4,6 +4,8 @@ import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { PersonaRepository } from './persona.repository';
 import { Persona } from './entities/persona.entity';
 import {DataSource} from 'typeorm';
+import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
+import { PaginationResult } from 'src/common/interfaces/PaginationResult.type';
 
 @Injectable()
 export class PersonaService {
@@ -13,8 +15,8 @@ export class PersonaService {
   ){}
 
 
-  async obtenerPersonas():Promise<Persona[]>{
-    const personas = await this.personaRepositopry.obtenerPersona();
+  async obtenerPersonas(dto: PaginacionParamsDto):Promise<PaginationResult<Persona>>{
+    const personas = await this.personaRepositopry.obtenerPersona(dto);
     return personas;
   }
 

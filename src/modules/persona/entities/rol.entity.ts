@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import { RolUsuario } from './rol-usuario.entity';
 
 @Entity({schema: 'seguridad',name:'rol'})
 export class Rol{
@@ -8,4 +9,10 @@ export class Rol{
 
     @Column({name: 'rol'})
     rol!: string;
+
+    @OneToMany( 
+        () =>RolUsuario, 
+        // falta la columna
+        (rolUsuario:RolUsuario) => rolUsuario.rol)
+        rolUsuario!: RolUsuario[]
 }

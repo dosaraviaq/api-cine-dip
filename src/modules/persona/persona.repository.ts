@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Persona } from "./entities/persona.entity";
 import { QueryRunner, Repository } from 'typeorm'
+import { PaginacionParamsDto } from "src/common/dto/PaginacionParams.dto";
+import { PaginationResult } from "src/common/interfaces/PaginationResult.type";
 
 @Injectable()
 export class PersonaRepository{
@@ -10,14 +12,15 @@ export class PersonaRepository{
         private readonly personaRepository: Repository<Persona> 
     ){}
 
-    async obtenerPersona():Promise<Persona[]> {
-        return await this.personaRepository.find(
-            {
-                order:{
-                    id: 'ASC'
-                }
-            }
-        );
+    async obtenerPersona(dto: PaginacionParamsDto):Promise<PaginationResult<Persona>> {
+       const [personas, total]= await this.personaRepository.findAndCount({
+        skip: (dto.pagina -1) *dto.porPagina,
+        take: dto.porPagina,
+        order:{
+            id: 'ASC'
+        }
+       });
+       return {data:personas,  total}
     }
 
     async obtenerPersonaId(id: number):Promise<Persona | null>

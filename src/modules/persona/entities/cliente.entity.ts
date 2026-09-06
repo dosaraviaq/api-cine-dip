@@ -1,4 +1,6 @@
-import {Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Persona } from './persona.entity';
+import { Reserva } from 'src/modules/reservas/entities/reserva.entity';
 
 @Entity({schema: 'identidad', name:'cliente'})
 export class Cliente{
@@ -10,4 +12,17 @@ export class Cliente{
 
     @Column({name: 'activo'})
     activo!: boolean;
+
+    @OneToOne(
+        ()=> Persona,
+        (persona: Persona) =>persona.cliente
+    )
+    @JoinColumn({name:'id_persona'})
+    persona!: Persona;
+
+    @OneToMany(
+        ()=> Reserva,
+        (reserva: Reserva) => reserva.cliente
+    )
+    reserva!: Reserva[];
 }

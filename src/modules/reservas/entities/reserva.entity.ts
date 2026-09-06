@@ -1,4 +1,7 @@
-import {Column, Entity, PrimaryGeneratedColumn}from 'typeorm';
+import { Cliente } from 'src/modules/persona/entities/cliente.entity';
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn}from 'typeorm';
+import { DetalleReserva } from './detalle-reserva.entity';
+import { Funcion } from './funcion.entity';
 
 @Entity({schema:'ventas', name:'reserva'})
 export class Reserva{
@@ -23,4 +26,24 @@ export class Reserva{
 
     @Column({name: 'total'})
     total!: number;
+
+    @ManyToOne(
+        ()=>Cliente,
+        (cliente: Cliente) => cliente.reserva
+    )
+    @JoinColumn({name:'id_cliente'})
+    cliente!: Cliente;
+
+    @OneToMany(
+        ()=> DetalleReserva,
+        (detalle: DetalleReserva)=> detalle.reserva
+    )
+    detalleReserva!: DetalleReserva[];
+
+    @ManyToOne(
+       ()=> Funcion,
+       (funcion: Funcion) =>funcion.reserva
+    )
+    @JoinColumn({name: 'id_funcion'})
+    funcion!: Funcion;
 }

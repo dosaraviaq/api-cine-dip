@@ -3,9 +3,20 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonaModule } from './modules/persona/persona.module';
 import { ReservasModule } from './modules/reservas/reservas.module';
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers:[
+        {
+          ttl: seconds(10),
+          limit:5
+        }
+      ],
+      errorMessage: 'Demasiadas Solicitudes'
+    }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -22,7 +33,12 @@ import { ReservasModule } from './modules/reservas/reservas.module';
     ReservasModule
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class AppModule {  
 }
