@@ -21,10 +21,10 @@ export class PersonaController {
      return ResponseUtils.success(persona, 'Persona Registrada correctamente')
    }
    
-   @Patch(':id')
-   async modifcarPersona(@Param('id') id:number,@Body() dataDto: CreatePersonaDto){
-      return await this.personaService.modifcarPersona(id, dataDto);
-   }
+   // @Patch(':id')
+   // async modifcarPersona(@Param('id') id:number,@Body() dataDto: CreatePersonaDto){
+   //    return await this.personaService.modifcarPersona(id, dataDto);
+   // }
    
    // TODO: EN ESTE PUNTO
    @Get()

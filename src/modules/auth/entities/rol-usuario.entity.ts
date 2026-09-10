@@ -2,6 +2,7 @@ import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedCo
 import { Rol } from './rol.entity';
 import { Usuario } from './usuario.entity';
 
+
 @Entity({schema:'seguridad', name:'rol_usuario'})
 export class RolUsuario{
 
@@ -14,7 +15,7 @@ export class RolUsuario{
     @Column({name: 'id_rol'})
     idRol!: number;
 
-    @Column({name: 'fecha_incio'})
+    @Column({name: 'fecha_inicio'})
     fechaInicio!: Date;
 
     @Column({name: 'fecha_fin'})

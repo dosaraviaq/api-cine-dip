@@ -1,6 +1,7 @@
 import {BeforeInsert, BeforeUpdate, Column, Entity, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
-import { Usuario } from './usuario.entity';
+
 import { Cliente } from './cliente.entity';
+import { Usuario } from 'src/modules/auth/entities/usuario.entity';
 
 @Entity({schema: 'identidad', name:'persona'})
 export class Persona {

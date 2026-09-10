@@ -4,14 +4,13 @@ import { PersonaController } from './persona.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Persona } from './entities/persona.entity';
 import { PersonaRepository } from './persona.repository';
-import { Rol } from './entities/rol.entity';
-import { RolUsuario } from './entities/rol-usuario.entity';
-import { Usuario } from './entities/usuario.entity';
 import { Cliente } from './entities/cliente.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Persona, Rol, RolUsuario, Usuario, Cliente])
+    TypeOrmModule.forFeature([Persona,  Cliente]),
+    AuthModule
   ],
   controllers: [PersonaController],
   providers: [PersonaService, PersonaRepository],

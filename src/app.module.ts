@@ -5,6 +5,7 @@ import { PersonaModule } from './modules/persona/persona.module';
 import { ReservasModule } from './modules/reservas/reservas.module';
 import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { APP_GUARD } from '@nestjs/core';
       logging: true
     }),
     PersonaModule,
-    ReservasModule
+    ReservasModule,
+    AuthModule
   ],
   controllers: [],
   providers: [

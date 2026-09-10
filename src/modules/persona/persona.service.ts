@@ -6,12 +6,14 @@ import { Persona } from './entities/persona.entity';
 import {DataSource} from 'typeorm';
 import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
 import { PaginationResult } from 'src/common/interfaces/PaginationResult.type';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class PersonaService {
   constructor(
     private readonly personaRepositopry: PersonaRepository,
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    private readonly authService: AuthService
   ){}
 
 
@@ -28,12 +30,21 @@ export class PersonaService {
   }
 
   async crearPersona(dataDto: CreatePersonaDto):Promise<Partial<Persona>>{
+    const {usuario, constrasena, ...personaData} = dataDto;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const persona = await this.personaRepositopry.crearPersona(dataDto, queryRunner);
-      // throw new NotFoundException();
+      const persona = await this.personaRepositopry.crearPersona(personaData, queryRunner);
+      // Crea mi usuario
+      await this.authService.crearUsuario({
+        idPersona: persona.id,
+        usuario: usuario,
+        contrasena: constrasena
+      },
+      3,
+      queryRunner
+    );
       await queryRunner.commitTransaction();
       return  {
         nombres: persona.nombres,
@@ -49,25 +60,25 @@ export class PersonaService {
     }
   }
 
-  async modifcarPersona(id: number, dataDto: CreatePersonaDto):Promise<Partial<Persona>>{
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const persona = await this.personaRepositopry.modificarPersona(id, dataDto, queryRunner);
-      // throw new NotFoundException();
-      await queryRunner.commitTransaction();
-      return  {
-        nombres: persona!.nombres,
-        apellidos: persona!.apellidos,
-        telefono: persona!.telefono
-      };
+  // async modifcarPersona(id: number, dataDto: Partial<CreatePersonaDto>):Promise<Partial<Persona>>{
+  //   const queryRunner = this.dataSource.createQueryRunner();
+  //   await queryRunner.connect();
+  //   await queryRunner.startTransaction();
+  //   try {
+  //     const persona = await this.personaRepositopry.modificarPersona(id, dataDto, queryRunner);
+  //     // throw new NotFoundException();
+  //     await queryRunner.commitTransaction();
+  //     return  {
+  //       nombres: persona!.nombres,
+  //       apellidos: persona!.apellidos,
+  //       telefono: persona!.telefono
+  //     };
       
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally{
-       await queryRunner.release();
-    }
-  }
+  //   } catch (error) {
+  //     await queryRunner.rollbackTransaction();
+  //     throw error;
+  //   } finally{
+  //      await queryRunner.release();
+  //   }
+  // }
 }
