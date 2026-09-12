@@ -9,7 +9,10 @@ import { HandleException } from 'src/common/decorators/handleException.decorator
 import { PaginatedResponse, SuccessResponse } from 'src/common/interfaces/CustomResponse.interface';
 import { ResponseUtils } from 'src/common/utils/Response.utils';
 import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { RolEnum } from '../auth/enums/rol.enum';
 
+@Auth(RolEnum.CLIENTE)
 @Controller('persona')
 export class PersonaController {
   constructor(private readonly personaService: PersonaService) {}

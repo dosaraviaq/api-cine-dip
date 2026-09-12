@@ -45,6 +45,12 @@ export class PersonaService {
       3,
       queryRunner
     );
+
+    await this.personaRepositopry.crearCliente({
+      idPersona: persona.id,
+      fechaRegistro: new Date(),
+      activo: true
+    }, queryRunner);
       await queryRunner.commitTransaction();
       return  {
         nombres: persona.nombres,

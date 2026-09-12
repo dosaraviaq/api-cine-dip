@@ -1,14 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
 import { Usuario } from './entities/usuario.entity';
 import {QueryRunner}from 'typeorm';
 import { Rol } from './entities/rol.entity';
 import * as bcrypt from 'bcrypt';
+import { loginUsuario } from './dto/login.dto';
+import { UsuarioRespuesta } from './types/usuario-respuesta.type';
+import { JwtPayload } from './types/jwt-payload.type';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly authRepository: AuthRepository
+        private readonly authRepository: AuthRepository,
+        private readonly jwtServicio: JwtService
     ){}
 
     async crearUsuario(
@@ -38,5 +43,28 @@ export class AuthService {
         if(!rol)
             throw new  BadRequestException('No se encontro el rol')
         return rol;
+    }
+
+    async login(dataDto: loginUsuario): Promise<{token:string}>{
+        const {usuario, contrasena} = dataDto;
+        const user = await this.authRepository.login(usuario);
+        if(!user)
+            throw new UnauthorizedException('Credenciales no válidas (usuario)');
+        const informacion= await this.authRepository.informacionUsuario(user.idPersona);
+
+        if(!bcrypt.compareSync(contrasena,user.contrasena))
+            throw new UnauthorizedException('Credenciales no válidas (contraseña)')
+
+        const payload: JwtPayload={
+            id: informacion.id,
+            usuario: informacion.usuario,
+            roles: informacion.roles
+        }
+        return {token: this.generarJwt(payload)};
+    }
+
+    // jwt
+    private generarJwt(payload: JwtPayload): string{
+        return this.jwtServicio.sign(payload)
     }
 }

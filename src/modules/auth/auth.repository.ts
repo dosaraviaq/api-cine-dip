@@ -4,6 +4,7 @@ import { Rol } from "./entities/rol.entity";
 import {QueryRunner, Repository} from 'typeorm';
 import { RolUsuario } from "./entities/rol-usuario.entity";
 import { Usuario } from "./entities/usuario.entity";
+import { UsuarioRespuesta } from "./types/usuario-respuesta.type";
 
 @Injectable()
 export class AuthRepository {
@@ -44,5 +45,26 @@ export class AuthRepository {
 
     async obtenerUsuarioId(id: number): Promise<Usuario | null>{
         return await this.usuarioRepository.findOneBy({idPersona: id});
+    }
+
+    // AUTENTICACIÓN
+    async login(usuario: string):Promise<Usuario | null>{
+        const user= this.usuarioRepository.findOne({
+            where : { usuario },
+            select :{ usuario: true, contrasena: true, idPersona:true}
+        })
+        return user;
+    }
+
+    async informacionUsuario(idPersona: number):Promise<UsuarioRespuesta>{
+        const user=  await this.usuarioRepository        
+        .createQueryBuilder('u')
+        .leftJoin('rol_usuario','ru','u.id_persona = ru.id_usuario')
+        .leftJoin('rol', 'r', 'r.id_rol = ru.id_rol')
+        .where('u.id_persona= :id',{id:idPersona})
+        .groupBy('u.id_persona')
+        .select(['u.id_persona id', 'u."usuario"','u."contrasena"', 'json_agg(distinct r.rol) roles'])
+        .getRawOne()
+        return user;
     }
 }

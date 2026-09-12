@@ -1,10 +1,10 @@
-import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { Persona } from './persona.entity';
 import { Reserva } from 'src/modules/reservas/entities/reserva.entity';
 
 @Entity({schema: 'identidad', name:'cliente'})
 export class Cliente{
-    @PrimaryGeneratedColumn({name:'id_persona'})
+    @PrimaryColumn({name:'id_persona'})
     idPersona!: number;
 
     @Column({name: 'fecha_registro'})

@@ -4,6 +4,7 @@ import { Persona } from "./entities/persona.entity";
 import { QueryRunner, Repository } from 'typeorm'
 import { PaginacionParamsDto } from "src/common/dto/PaginacionParams.dto";
 import { PaginationResult } from "src/common/interfaces/PaginationResult.type";
+import { Cliente } from "./entities/cliente.entity";
 
 @Injectable()
 export class PersonaRepository{
@@ -50,5 +51,12 @@ export class PersonaRepository{
     return await manager.save(persona);
     }
 
-
+     async crearCliente(
+        data: Partial<Cliente>,
+        queryRunner: QueryRunner
+    ):Promise<Cliente>{
+        const manager=  queryRunner.manager;
+        const persona = manager.create(Cliente, data);
+        return await manager.save(persona);
+    }
 }
