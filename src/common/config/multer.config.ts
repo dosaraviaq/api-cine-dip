@@ -19,7 +19,7 @@ export function configuracionMulter(
             }
         }),
 
-        fileFilter(_request, archivo, callback) {
+        fileFilter:(_request, archivo, callback) =>{
             const tiposExtensiones =[
                 'image/jpg',
                 'image/jpeg',
@@ -30,7 +30,7 @@ export function configuracionMulter(
 
             const tiposPermitidos =['.jpg', '.jpeg', '.png','.webp'];
             const extension= extname(archivo.originalname).toLowerCase();
-            const tipoValido = tiposPermitidos.includes(archivo.mimetype);
+            const tipoValido = tiposExtensiones.includes(archivo.mimetype);
             const extencionValida= tiposPermitidos.includes(extension);
 
             if(!tipoValido || !extencionValida)

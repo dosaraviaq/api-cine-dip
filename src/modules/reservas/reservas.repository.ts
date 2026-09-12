@@ -34,9 +34,9 @@ export class ReservasRepository {
   }
 
   async crearImagenesPelicula(
-    data: Partial<ImagenPelicula>,
+    data: Partial<ImagenPelicula>[],
     queryRunner: QueryRunner,
-  ): Promise<ImagenPelicula> {
+  ): Promise<ImagenPelicula[]> {
     const manager = queryRunner.manager;
     const imagen = manager.create(ImagenPelicula, data);
     return await manager.save(imagen);
