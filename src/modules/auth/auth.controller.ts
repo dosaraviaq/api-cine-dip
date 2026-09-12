@@ -5,7 +5,10 @@ import { loginUsuario } from './dto/login.dto';
 import { SuccessResponse } from 'src/common/interfaces/CustomResponse.interface';
 import { ResponseUtils } from 'src/common/utils/Response.utils';
 import { UsuarioRespuesta } from './types/usuario-respuesta.type';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Usuario } from './entities/usuario.entity';
 
+@ApiTags('Autenticación')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -13,6 +16,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @ApiResponse({ status: 201, description: 'Autenticación de usuario', type:loginUsuario})
   @HandleException('Error en la autenticación')
   async loginUsuario(
     @Body() dataDto: loginUsuario
