@@ -8,10 +8,11 @@ import { Pelicula } from './entities/pelicula.entity';
 import { Funcion } from './entities/funcion.entity';
 import { Sala } from './entities/sala.entity';
 import { DetalleReserva } from './entities/detalle-reserva.entity';
+import { ImagenPelicula } from './entities/imagen-pelicula.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Reserva, Asiento, Pelicula, Funcion, Sala, DetalleReserva])
+    TypeOrmModule.forFeature([Reserva, Asiento, Pelicula, Funcion, Sala, DetalleReserva,ImagenPelicula])
   ],
   controllers: [ReservasController],
   providers: [ReservasService],

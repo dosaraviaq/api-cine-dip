@@ -12,7 +12,7 @@ import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { RolEnum } from '../auth/enums/rol.enum';
 
-@Auth(RolEnum.CLIENTE)
+@Auth(RolEnum.ADMIN, RolEnum.GERENTE)
 @Controller('persona')
 export class PersonaController {
   constructor(private readonly personaService: PersonaService) {}
@@ -31,6 +31,7 @@ export class PersonaController {
    
    // TODO: EN ESTE PUNTO
    @Get()
+   @Auth(RolEnum.ADMIN)
    @HandleException('Error al cargar la lista de personas')   
    async ObtenerPersonas(@Query() dto: PaginacionParamsDto ):Promise<PaginatedResponse<Persona>>{
     const personas= await this.personaService.obtenerPersonas(dto);      

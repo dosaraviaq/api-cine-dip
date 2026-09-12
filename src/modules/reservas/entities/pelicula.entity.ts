@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Funcion } from './funcion.entity';
+import { ImagenPelicula } from './imagen-pelicula.entity';
 
 @Entity({ schema: 'cartelera', name: 'pelicula' })
 export class Pelicula {
@@ -27,4 +28,7 @@ export class Pelicula {
         (funcion: Funcion)=> funcion.pelicula
     )
     funcion!: Funcion[];
+
+    @OneToMany(() => ImagenPelicula, (imagen: ImagenPelicula) => imagen.pelicula)
+  imagenes!: ImagenPelicula[];
 }
