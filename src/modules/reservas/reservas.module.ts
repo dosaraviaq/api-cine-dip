@@ -9,12 +9,14 @@ import { Funcion } from './entities/funcion.entity';
 import { Sala } from './entities/sala.entity';
 import { DetalleReserva } from './entities/detalle-reserva.entity';
 import { ImagenPelicula } from './entities/imagen-pelicula.entity';
+import { ReservasRepository } from './reservas.repository';
+import { PeliculasController } from './peliculas.controller';
 
 @Module({
   imports:[
     TypeOrmModule.forFeature([Reserva, Asiento, Pelicula, Funcion, Sala, DetalleReserva,ImagenPelicula])
   ],
-  controllers: [ReservasController],
-  providers: [ReservasService],
+  controllers: [ReservasController, PeliculasController],
+  providers: [ReservasService, ReservasRepository],
 })
 export class ReservasModule {}
