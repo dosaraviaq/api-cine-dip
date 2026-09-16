@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reserva } from './entities/reserva.entity';
 import { QueryRunner, Repository } from 'typeorm';
-import { Pelicula } from './entities/pelicula.entity';
-import { Sala } from './entities/sala.entity';
-import { ImagenPelicula } from './entities/imagen-pelicula.entity';
 import { Funcion } from './entities/funcion.entity';
+import { Pelicula } from './entities/pelicula.entity';
 import { Asiento } from './entities/asiento.entity';
 import { DetalleReserva } from './entities/detalle-reserva.entity';
+import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
+import { PaginationResult } from 'src/common/interfaces/PaginationResult.type';
+import { Sala } from './entities/sala.entity';
+import { ReservaListado } from './types/resultado-reservas.type';
+import { ImagenPelicula } from './entities/imagen-pelicula.entity';
+import { PeliculaListado } from './types/pelicula-listado.type';
 
 @Injectable()
 export class ReservasRepository {
@@ -29,19 +33,59 @@ export class ReservasRepository {
     return await manager.save(pelicula);
   }
 
-  async obtenerPeliculas():Promise<Pelicula[]>{
-    return await this.peliculaRepository.find();
-  }
-
   async crearImagenesPelicula(
     data: Partial<ImagenPelicula>[],
     queryRunner: QueryRunner,
   ): Promise<ImagenPelicula[]> {
-    const manager = queryRunner.manager;
-    const imagen = manager.create(ImagenPelicula, data);
-    return await manager.save(imagen);
+    const imagenes = queryRunner.manager.create(ImagenPelicula, data);
+    return queryRunner.manager.save(imagenes);
   }
 
+  async obtenerPeliculas(
+  dto: PaginacionParamsDto,
+): Promise<PaginationResult<PeliculaListado>> {
+  const { pagina = 1, porPagina = 10 } = dto;
+
+  const query = this.peliculaRepository
+    .createQueryBuilder('p')
+    .leftJoin('p.imagenes', 'ip')
+    .select([
+      'p.id AS "id"',
+      'p.titulo AS "titulo"',
+      'p.sinopsis AS "sinopsis"',
+      'p.duracion AS "duracionMinutos"',
+      'p.fecha AS "fechaEstreno"',
+      'p.activo AS "activo"',
+    ])
+    .addSelect(
+      `
+        COALESCE(
+          JSON_AGG(
+            ip.nombre_archivo
+            ORDER BY ip.id_imagen_pelicula
+          ) FILTER (
+            WHERE ip.id_imagen_pelicula IS NOT NULL
+          ),
+          '[]'::JSON
+        )
+      `,
+      'imagenes',
+    )
+    .groupBy('p.id')
+    .orderBy('p.id', 'ASC')
+    .offset((pagina - 1) * porPagina)
+    .limit(porPagina);
+
+  const [peliculas, total] = await Promise.all([
+    query.getRawMany<PeliculaListado>(),
+    this.peliculaRepository.count(),
+  ]);
+
+  return {
+    data: peliculas,
+    total,
+  };
+}
   async crearFuncion(
     data: Partial<Funcion>,
     queryRunner: QueryRunner,
@@ -52,11 +96,11 @@ export class ReservasRepository {
   }
 
   async crearSala(
-    data: Partial<Sala>,
+    data: Partial<Pelicula>,
     queryRunner: QueryRunner,
-  ): Promise<Sala> {
+  ): Promise<Pelicula> {
     const manager = queryRunner.manager;
-    const sala = manager.create(Sala, data);
+    const sala = manager.create(Pelicula, data);
     return await manager.save(sala);
   }
 
@@ -87,5 +131,64 @@ export class ReservasRepository {
     return await manager.save(reserva);
   }
 
+  //   consultas con paginación
 
+  async obtenerSalas(
+    dto: PaginacionParamsDto,
+  ): Promise<PaginationResult<Sala>> {
+    const [peliculas, total] = await this.salaRepository.findAndCount({
+      skip: (dto.pagina - 1) * dto.porPagina,
+      take: dto.porPagina,
+      order: {
+        id: 'ASC',
+      },
+    });
+    return { data: peliculas, total };
+  }
+
+  //todo!   Obtiene todas las reservas por ver
+  async obtenerReservas(
+    dto: PaginacionParamsDto,
+  ): Promise<PaginationResult<ReservaListado>> {
+    const { pagina = 1, porPagina = 10 } = dto;
+
+    const query = this.reservaRepository
+      .createQueryBuilder('r')
+      .innerJoin('ventas.detalle_reserva', 'dr', 'dr.id_reserva = r.id_reserva')
+      .innerJoin('cartelera.asiento', 'a', 'a.id_asiento = dr.id_asiento')
+      .innerJoin('identidad.cliente', 'c', 'c.id_persona = r.id_cliente')
+      .innerJoin('identidad.persona', 'p', 'p.id_persona = c.id_persona')
+      .select([
+        `CONCAT_WS(' ', p.nombres, p.apellidos) AS "cliente"`,
+        `r.fecha_reserva AS "fechaReserva"`,
+        `r.codigo_reserva AS "codigoReserva"`,
+        `r.estado AS "estado"`,
+        `
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'filaAsiento', a.fila,
+            'numeroAsiento', a.numero
+          )
+          ORDER BY a.fila, a.numero
+        ) AS "detalleAsiento"
+      `,
+      ])
+      .groupBy('p.id_persona')
+      .addGroupBy('r.id_reserva')
+      .orderBy('r.fecha_reserva', 'DESC')
+      .offset((pagina - 1) * porPagina)
+      .limit(porPagina);
+
+    const data = await query.getRawMany<ReservaListado>();
+
+    const resultadoTotal = await this.reservaRepository
+      .createQueryBuilder('r')
+      .select('COUNT(DISTINCT r.id_reserva)', 'total')
+      .getRawOne<{ total: string }>();
+
+    return {
+      data,
+      total: Number(resultadoTotal?.total ?? 0),
+    };
+  }
 }

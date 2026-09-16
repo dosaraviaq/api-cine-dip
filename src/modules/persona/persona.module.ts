@@ -13,6 +13,7 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule
   ],
   controllers: [PersonaController],
-  providers: [PersonaService, PersonaRepository],
+  providers: [ PersonaService, PersonaRepository],
+  exports:[TypeOrmModule, PersonaService, PersonaRepository]
 })
 export class PersonaModule {}

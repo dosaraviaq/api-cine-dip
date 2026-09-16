@@ -11,10 +11,22 @@ import { DetalleReserva } from './entities/detalle-reserva.entity';
 import { ImagenPelicula } from './entities/imagen-pelicula.entity';
 import { ReservasRepository } from './reservas.repository';
 import { PeliculasController } from './peliculas.controller';
+import { PersonaModule } from '../persona/persona.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports:[
-    TypeOrmModule.forFeature([Reserva, Asiento, Pelicula, Funcion, Sala, DetalleReserva,ImagenPelicula])
+  imports: [
+    TypeOrmModule.forFeature([
+      Reserva,
+      Asiento,
+      Pelicula,
+      Funcion,
+      Sala,
+      DetalleReserva,
+      ImagenPelicula,
+    ]),
+    PersonaModule,
+    ConfigModule
   ],
   controllers: [ReservasController, PeliculasController],
   providers: [ReservasService, ReservasRepository],
