@@ -58,6 +58,16 @@ export class PersonaController {
     return ResponseUtils.success(persona, 'Persona Registrada correctamente');
   }
 
+  @Post('gerente')
+  @Auth(RolEnum.ADMIN, RolEnum.GERENTE)
+  @HandleException('Error al registrar al tecnico')
+  async crearPersonaRol(
+    @Body() dataDto: CreatePersonaDto,
+  ): Promise<SuccessResponse<Partial<Persona>>> {
+    const persona = await this.personaService.crearPersonaRol(dataDto);
+    return ResponseUtils.success(persona, 'Persona Registrada correctamente');
+  }
+
   // @Patch(':id')
   // async modifcarPersona(@Param('id') id:number,@Body() dataDto: CreatePersonaDto){
   //    return await this.personaService.modifcarPersona(id, dataDto);

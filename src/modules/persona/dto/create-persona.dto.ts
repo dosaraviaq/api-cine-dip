@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
   IsEmail,
+  IsNumber,
   IsString,
   MaxLength,
   MinLength,
@@ -59,4 +60,7 @@ export class CreatePersonaDto {
     example: 'ClaveSegura123',
   })
   constrasena!: string;
+
+  @IsNumber()
+  rol: number=3;
 }

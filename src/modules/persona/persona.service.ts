@@ -3,7 +3,7 @@ import { CreatePersonaDto } from './dto/create-persona.dto';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { PersonaRepository } from './persona.repository';
 import { Persona } from './entities/persona.entity';
-import {DataSource} from 'typeorm';
+import { DataSource } from 'typeorm';
 import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
 import { PaginationResult } from 'src/common/interfaces/PaginationResult.type';
 import { AuthService } from '../auth/auth.service';
@@ -13,57 +13,69 @@ export class PersonaService {
   constructor(
     private readonly personaRepositopry: PersonaRepository,
     private readonly dataSource: DataSource,
-    private readonly authService: AuthService
-  ){}
+    private readonly authService: AuthService,
+  ) {}
 
-
-  async obtenerPersonas(dto: PaginacionParamsDto):Promise<PaginationResult<Persona>>{
+  async obtenerPersonas(
+    dto: PaginacionParamsDto,
+  ): Promise<PaginationResult<Persona>> {
     const personas = await this.personaRepositopry.obtenerPersona(dto);
     return personas;
   }
 
-  async obtenerPersonaId(id: number):Promise<Persona>{
-    const persona= await this.personaRepositopry.obtenerPersonaId(id);    
-    if(!persona)
-      throw new NotFoundException('No se encontro la persona con el id:'+ id)    
+  async obtenerPersonaId(id: number): Promise<Persona> {
+    const persona = await this.personaRepositopry.obtenerPersonaId(id);
+    if (!persona)
+      throw new NotFoundException('No se encontro la persona con el id:' + id);
     return persona;
   }
 
-  async crearPersona(dataDto: CreatePersonaDto):Promise<Partial<Persona>>{
-    const {usuario, constrasena, ...personaData} = dataDto;
+  async crearPersona(dataDto: CreatePersonaDto): Promise<Partial<Persona>> {
+    const { usuario, constrasena, ...personaData } = dataDto;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const persona = await this.personaRepositopry.crearPersona(personaData, queryRunner);
+      const persona = await this.personaRepositopry.crearPersona(
+        personaData,
+        queryRunner,
+      );
       // Crea mi usuario
-      await this.authService.crearUsuario({
-        idPersona: persona.id,
-        usuario: usuario,
-        contrasena: constrasena
-      },
-      3,
-      queryRunner
-    );
+      await this.authService.crearUsuario(
+        {
+          idPersona: persona.id,
+          usuario: usuario,
+          contrasena: constrasena,
+        },
+        dataDto.rol,
+        queryRunner,
+      );
 
-    await this.personaRepositopry.crearCliente({
-      idPersona: persona.id,
-      fechaRegistro: new Date(),
-      activo: true
-    }, queryRunner);
+      await this.personaRepositopry.crearCliente(
+        {
+          idPersona: persona.id,
+          fechaRegistro: new Date(),
+          activo: true,
+        },
+        queryRunner,
+      );
       await queryRunner.commitTransaction();
-      return  {
+      return {
         nombres: persona.nombres,
         apellidos: persona.apellidos,
-        telefono: persona.telefono
+        telefono: persona.telefono,
       };
-      
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
-    } finally{
-       await queryRunner.release();
+    } finally {
+      await queryRunner.release();
     }
+  }
+
+  async crearPersonaRol(dataDto: CreatePersonaDto): Promise<Partial<Persona>> {
+    dataDto.rol = 2;
+    return this.crearPersona(dataDto);
   }
 
   // async modifcarPersona(id: number, dataDto: Partial<CreatePersonaDto>):Promise<Partial<Persona>>{
@@ -79,7 +91,7 @@ export class PersonaService {
   //       apellidos: persona!.apellidos,
   //       telefono: persona!.telefono
   //     };
-      
+
   //   } catch (error) {
   //     await queryRunner.rollbackTransaction();
   //     throw error;
