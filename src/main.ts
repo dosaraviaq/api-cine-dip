@@ -1,18 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe,Logger } from '@nestjs/common';
-import { METHODS } from 'http';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const logger = new Logger('Bootstrap')
+  const logger = new Logger('Bootstrap');
 
   app.enableCors({
     origin: true,
     METHODS: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
-    allowedHeaders:'Content-Type, Accept, Authorization'
+    allowedHeaders: 'Content-Type, Accept, Authorization',
   });
 
   app.setGlobalPrefix('api/v1');
@@ -21,20 +20,25 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true
-    })
-  )
-
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   const config = new DocumentBuilder()
-  .setTitle('Diplomado')
-  .setDescription('Framework Nestjs')
-  .setVersion('0.0.1')
-  .build();
+    .setTitle('Diplomado')
+    .setDescription('Framework Nestjs')
+    .setVersion('0.0.1')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      description: 'Obtén el token en POST /api/v1/auth/login y pégalo aquí.',
+    })
+    .build();
 
-  const documento= SwaggerModule.createDocument(app,config );
+  const documento = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('documentacion', app, documento);
-  
+
   await app.listen(process.env.PORT ?? 3000);
   logger.log(`La aplicación está corriendo en: ${await app.getUrl()}`);
 }

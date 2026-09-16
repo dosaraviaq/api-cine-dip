@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -30,6 +31,12 @@ class DetalleReservaDto {
   @IsPositive({
     message: 'El identificador del asiento debe ser mayor que cero',
   })
+  @ApiProperty({
+    type: 'integer',
+    minimum: 1,
+    example: 1,
+    description: 'Identificador del asiento.',
+  })
   idAsiento!: number;
 
   @Type(() => Number)
@@ -47,6 +54,13 @@ class DetalleReservaDto {
   @IsPositive({
     message: 'El precio del asiento debe ser mayor que cero',
   })
+  @ApiProperty({
+    minimum: 0,
+    exclusiveMinimum: true,
+    multipleOf: 0.01,
+    example: 35,
+    description: 'Precio positivo con máximo dos decimales.',
+  })
   precio!: number;
 }
 
@@ -61,6 +75,12 @@ export class CrearReservaDto {
   @IsPositive({
     message: 'El identificador del cliente debe ser mayor que cero',
   })
+  @ApiProperty({
+    type: 'integer',
+    minimum: 1,
+    example: 1,
+    description: 'Identificador del cliente.',
+  })
   idCliente!: number;
 
   @Type(() => Number)
@@ -72,6 +92,12 @@ export class CrearReservaDto {
   })
   @IsPositive({
     message: 'El identificador de la función debe ser mayor que cero',
+  })
+  @ApiProperty({
+    type: 'integer',
+    minimum: 1,
+    example: 1,
+    description: 'Identificador de la función.',
   })
   idFuncion!: number;
 
@@ -85,6 +111,10 @@ export class CrearReservaDto {
         'La fecha de la reserva debe tener un formato válido, por ejemplo: 2026-09-12T10:30:00',
     },
   )
+  @ApiProperty({
+    description: 'Fecha de reserva en formato ISO 8601.',
+    example: '2026-09-15T20:00:00.000Z',
+  })
   fechaReserva!: string;
 
   @Transform(({ value }) =>
@@ -96,6 +126,11 @@ export class CrearReservaDto {
   // @Matches(/^RES-\d{3}-\d{4}$/, {
   //   message: 'El código de la reserva debe tener el formato RES-001-2026',
   // })
+  @ApiProperty({
+    description:
+      'Código de reserva; se recortan espacios y se convierte a mayúsculas.',
+    example: 'RES-001-2026',
+  })
   codigoReserva!: string;
 
   @Transform(({ value }) =>
@@ -107,6 +142,11 @@ export class CrearReservaDto {
   @IsEnum(EstadoReserva, {
     message:
       'El estado de la reserva debe ser PENDIENTE, CONFIRMADA o CANCELADA',
+  })
+  @ApiProperty({
+    enum: EstadoReserva,
+    enumName: 'EstadoReserva',
+    example: EstadoReserva.PENDIENTE,
   })
   estado!: EstadoReserva;
 
@@ -125,6 +165,13 @@ export class CrearReservaDto {
   @IsPositive({
     message: 'El total de la reserva debe ser mayor que cero',
   })
+  @ApiProperty({
+    minimum: 0,
+    exclusiveMinimum: true,
+    multipleOf: 0.01,
+    example: 70,
+    description: 'Total positivo con máximo dos decimales.',
+  })
   total!: number;
 
   @IsArray({
@@ -138,5 +185,14 @@ export class CrearReservaDto {
   })
   @ValidateNested({ each: true })
   @Type(() => DetalleReservaDto)
+  @ApiProperty({
+    type: () => [DetalleReservaDto],
+    minItems: 1,
+    description: 'Asientos reservados. No se permite repetir idAsiento.',
+    example: [
+      { idAsiento: 1, precio: 35 },
+      { idAsiento: 2, precio: 35 },
+    ],
+  })
   detalles!: DetalleReservaDto[];
 }
