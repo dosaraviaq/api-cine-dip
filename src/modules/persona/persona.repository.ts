@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Persona } from "./entities/persona.entity";
-import { QueryRunner, Repository } from 'typeorm'
+import { FindOptionsWhere, ILike, QueryRunner, Repository } from 'typeorm'
+import { BuscarPersonaDto } from './dto/buscar-persona.dto';
 import { PaginacionParamsDto } from "src/common/dto/PaginacionParams.dto";
 import { PaginationResult } from "src/common/interfaces/PaginationResult.type";
 import { Cliente } from "./entities/cliente.entity";
@@ -22,6 +23,20 @@ export class PersonaRepository{
         }
        });
        return {data:personas,  total}
+    }
+
+    async buscarPersonas(dto: BuscarPersonaDto): Promise<PaginationResult<Persona>> {
+        const where: FindOptionsWhere<Persona> = {};
+        const patron = (valor: string) => `%${valor.replace(/[\\%_]/g, '\\$&')}%`;
+        if (dto.nombres) where.nombres = ILike(patron(dto.nombres));
+        if (dto.apellidos) where.apellidos = ILike(patron(dto.apellidos));
+        const [data, total] = await this.personaRepository.findAndCount({
+            where,
+            skip: (dto.pagina - 1) * dto.porPagina,
+            take: dto.porPagina,
+            order: { id: 'ASC' },
+        });
+        return { data, total };
     }
 
     async obtenerPersonaId(id: number):Promise<Persona | null>

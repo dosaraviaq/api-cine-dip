@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BuscarPersonaDto } from './dto/buscar-persona.dto';
 import { CreatePersonaDto } from './dto/create-persona.dto';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { PersonaRepository } from './persona.repository';
@@ -21,6 +22,13 @@ export class PersonaService {
   ): Promise<PaginationResult<Persona>> {
     const personas = await this.personaRepositopry.obtenerPersona(dto);
     return personas;
+  }
+
+  async buscarPersonas(dto: BuscarPersonaDto): Promise<PaginationResult<Persona>> {
+    if (!dto.nombres && !dto.apellidos) {
+      throw new BadRequestException('Debe enviar nombres o apellidos para buscar');
+    }
+    return this.personaRepositopry.buscarPersonas(dto);
   }
 
   async obtenerPersonaId(id: number): Promise<Persona> {

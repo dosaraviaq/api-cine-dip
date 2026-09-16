@@ -28,6 +28,7 @@ import { ResponseUtils } from 'src/common/utils/Response.utils';
 import { PaginacionParamsDto } from 'src/common/dto/PaginacionParams.dto';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { RolEnum } from '../auth/enums/rol.enum';
+import { BuscarPersonaDto } from './dto/buscar-persona.dto';
 
 @ApiTags('Personas')
 @ApiTooManyRequestsResponse({ description: 'Límite de solicitudes excedido.' })
@@ -108,6 +109,24 @@ export class PersonaController {
       dto.pagina,
       dto.porPagina,
       'Lista de personas Cargadas Correctamente',
+    );
+  }
+
+  @Get('buscar')
+  @Auth(RolEnum.ADMIN, RolEnum.GERENTE)
+  @ApiOperation({
+    summary: 'Buscar personas por nombres y apellidos',
+    description: 'Requiere nombres o apellidos. Busca coincidencias parciales sin distinguir mayusculas; si envia ambos, deben coincidir ambos. Requiere ADMIN o GERENTE. Sin coincidencias devuelve una lista vacia.',
+  })
+  @ApiQuery({ type: BuscarPersonaDto })
+  @ApiSuccessResponse(PersonaRespuestaDto, 'Busqueda de personas realizada correctamente', 200, true)
+  @ApiBadRequestResponse({ description: 'Filtros ausentes, vacios o paginacion invalida.' })
+  @HandleException('Error al buscar personas')
+  async buscarPersonas(@Query() dto: BuscarPersonaDto): Promise<PaginatedResponse<Persona>> {
+    const resultado = await this.personaService.buscarPersonas(dto);
+    return ResponseUtils.paginated(
+      resultado.data, resultado.total, dto.pagina, dto.porPagina,
+      'Busqueda de personas realizada correctamente',
     );
   }
 
