@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
@@ -12,6 +13,8 @@ import { loginUsuario } from './dto/login.dto';
 import { UsuarioRespuesta } from './types/usuario-respuesta.type';
 import { JwtPayload } from './types/jwt-payload.type';
 import { JwtService } from '@nestjs/jwt';
+import { AsignarRolUsuarioDto } from './dto/asignar-rol-usuario.dto';
+import { RolUsuario } from './entities/rol-usuario.entity';
 
 @Injectable()
 export class AuthService {
@@ -43,6 +46,16 @@ export class AuthService {
       queryRunner,
     );
     return usuario;
+  }
+
+  async asignarRolUsuario(dataDto: AsignarRolUsuarioDto): Promise<RolUsuario> {
+    const { idPersona, idRol } = dataDto;
+    const usuario = await this.authRepository.obtenerUsuarioId(idPersona);
+    if (!usuario) {
+      throw new NotFoundException('No se encontro un usuario para la persona indicada');
+    }
+    await this.obtenerRolId(idRol);
+    return this.authRepository.asignarRolUsuario(idPersona, idRol);
   }
 
   private async obtenerRolId(id: number): Promise<Rol> {
@@ -81,4 +94,6 @@ export class AuthService {
   private generarJwt(payload: JwtPayload): string {
     return this.jwtServicio.sign(payload);
   }
+
+  
 }

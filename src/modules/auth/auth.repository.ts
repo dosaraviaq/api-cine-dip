@@ -39,6 +39,16 @@ export class AuthRepository {
         return await this.rolRepository.findOneBy({id: id});
     }
 
+    async asignarRolUsuario(idPersona: number, idRol: number): Promise<RolUsuario>{
+        const rolUsuario = this.rolUsuarioRepository.create({
+            idUsuario: idPersona,
+            idRol,
+            estado: true,
+            fechaInicio: new Date(),
+        });
+        return await this.rolUsuarioRepository.save(rolUsuario);
+    }
+
     async obtenerRolUsuarioId(id: number): Promise<RolUsuario | null>{
         return await this.rolUsuarioRepository.findOneBy({idRolUsuario: id});
     }
