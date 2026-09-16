@@ -10,8 +10,8 @@ export class FilesService {
   obtenerImagenPelicula(nombreArchivo: string): string {
     const rutaArchivo = join(
       process.cwd(),
-      'static',
-      'uploads',
+      'estatico',
+      'imagenes',
       nombreArchivo,
     );
 

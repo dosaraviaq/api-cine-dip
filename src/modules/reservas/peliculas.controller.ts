@@ -42,7 +42,6 @@ import { RolEnum } from '../auth/enums/rol.enum';
 import { Auth } from '../auth/decorators/auth.decorator';
 
 @ApiTags('Películas')
-@Auth(RolEnum.ADMIN, RolEnum.GERENTE)
 @ApiExtraModels(CrearPeliculaDto)
 @ApiTooManyRequestsResponse({ description: 'Límite de solicitudes excedido.' })
 @ApiInternalServerErrorResponse({
@@ -93,6 +92,7 @@ export class PeliculasController {
   @UseInterceptors(
     FilesInterceptor('imagenes', 5, configuracionMulter('pelicula', 5)),
   )
+  @Auth(RolEnum.ADMIN, RolEnum.GERENTE)
   @HandleException('Error al registrar la película')
   async crearPelicula(
     @Body() dataDto: CrearPeliculaDto,
