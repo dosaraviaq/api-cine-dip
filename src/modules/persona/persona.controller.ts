@@ -34,7 +34,6 @@ import { RolEnum } from '../auth/enums/rol.enum';
 @ApiInternalServerErrorResponse({
   description: 'Error interno al procesar la persona.',
 })
-@Auth(RolEnum.ADMIN, RolEnum.GERENTE)
 @Controller('persona')
 export class PersonaController {
   constructor(private readonly personaService: PersonaService) {}
@@ -50,6 +49,7 @@ export class PersonaController {
     description: 'Datos inválidos o rol de cliente no encontrado.',
   })
   @Post()
+  // @Auth(RolEnum.CLIENTE)
   @HandleException('Error al registrar a la persona')
   async crearPersona(
     @Body() dataDto: CreatePersonaDto,
@@ -63,7 +63,6 @@ export class PersonaController {
   //    return await this.personaService.modifcarPersona(id, dataDto);
   // }
 
-  // TODO: EN ESTE PUNTO
   @ApiOperation({
     summary: 'Listar personas',
     description: 'Devuelve personas paginadas. Requiere rol ADMIN.',
@@ -77,7 +76,7 @@ export class PersonaController {
   @ApiBadRequestResponse({ description: 'Parámetros de paginación inválidos.' })
   @ApiQuery({ type: PaginacionParamsDto })
   @Get()
-  @Auth(RolEnum.ADMIN)
+  @Auth(RolEnum.ADMIN, RolEnum.GERENTE)
   @HandleException('Error al cargar la lista de personas')
   async ObtenerPersonas(
     @Query() dto: PaginacionParamsDto,

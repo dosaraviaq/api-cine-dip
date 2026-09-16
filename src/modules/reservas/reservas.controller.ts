@@ -16,9 +16,12 @@ import { SuccessResponse } from 'src/common/interfaces/CustomResponse.interface'
 import { ResponseUtils } from 'src/common/utils/Response.utils';
 import { DetalleReserva } from './entities/detalle-reserva.entity';
 import { ReservasService } from './reservas.service';
+import { RolEnum } from '../auth/enums/rol.enum';
+import { Auth } from '../auth/decorators/auth.decorator';
 
 @ApiTags('Reservas')
 @ApiTooManyRequestsResponse({ description: 'Límite de solicitudes excedido.' })
+@Auth(RolEnum.CLIENTE)
 @Controller('reservas')
 export class ReservasController {
   constructor(private readonly reservasService: ReservasService) {}

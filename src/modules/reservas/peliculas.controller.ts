@@ -38,8 +38,11 @@ import { ResponseUtils } from 'src/common/utils/Response.utils';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { configuracionMulter } from 'src/common/config/multer.config';
 import { PeliculaListado } from './types/pelicula-listado.type';
+import { RolEnum } from '../auth/enums/rol.enum';
+import { Auth } from '../auth/decorators/auth.decorator';
 
 @ApiTags('Películas')
+@Auth(RolEnum.ADMIN, RolEnum.GERENTE)
 @ApiExtraModels(CrearPeliculaDto)
 @ApiTooManyRequestsResponse({ description: 'Límite de solicitudes excedido.' })
 @ApiInternalServerErrorResponse({

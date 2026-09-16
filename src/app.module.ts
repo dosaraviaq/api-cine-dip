@@ -34,7 +34,6 @@ import { AuthModule } from './modules/auth/auth.module';
     ReservasModule,
     AuthModule
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD,
