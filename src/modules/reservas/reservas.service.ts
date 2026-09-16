@@ -26,7 +26,7 @@ export class ReservasService {
   async crearPelicula(
     dataDto: CrearPeliculaDto,
     archivos: Express.Multer.File[] = [],
-  ): Promise<Pelicula> {
+  ): Promise<Partial<Pelicula>> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -65,7 +65,13 @@ export class ReservasService {
 
       await queryRunner.commitTransaction();
 
-      return pelicula;
+      return {
+        id: pelicula.id,
+        titulo: pelicula.titulo,
+        sinopsis: pelicula.sinopsis,
+        duracion: pelicula.duracion,
+        fecha: pelicula.fecha        
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

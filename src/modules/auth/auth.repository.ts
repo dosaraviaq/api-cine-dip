@@ -36,7 +36,7 @@ export class AuthRepository {
     }
 
     async obtenerRolId(id: number): Promise<Rol | null>{
-        return await this.rolRepository.findOneBy({idRol: id});
+        return await this.rolRepository.findOneBy({id: id});
     }
 
     async obtenerRolUsuarioId(id: number): Promise<RolUsuario | null>{
@@ -66,5 +66,9 @@ export class AuthRepository {
         .select(['u.id_persona id', 'u."usuario"','u."contrasena"', 'json_agg(distinct r.rol) roles'])
         .getRawOne()
         return user;
+    }
+
+    async listarRoles():Promise<Rol[]>{
+        return await this.rolRepository.find();
     }
 }

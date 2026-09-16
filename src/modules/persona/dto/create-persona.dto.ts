@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDateString,
   IsEmail,
@@ -62,5 +62,12 @@ export class CreatePersonaDto {
   constrasena!: string;
 
   @IsNumber()
+  @ApiPropertyOptional({
+    type: Number,
+    description:
+      'Identificador de un rol existente en la base de datos. En POST /persona/gerente se fuerza a 2, aunque se envie otro valor.',
+    default: 3,
+    example: 3,
+  })
   rol: number=3;
 }

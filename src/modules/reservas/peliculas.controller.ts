@@ -97,7 +97,7 @@ export class PeliculasController {
   async crearPelicula(
     @Body() dataDto: CrearPeliculaDto,
     @UploadedFiles() archivos?: Express.Multer.File[],
-  ): Promise<SuccessResponse<Pelicula>> {
+  ): Promise<SuccessResponse<Partial<Pelicula>>> {
     const pelicula = await this.reservasService.crearPelicula(
       dataDto,
       archivos,

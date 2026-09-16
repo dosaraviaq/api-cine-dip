@@ -13,6 +13,8 @@ import { ReservasRepository } from './reservas.repository';
 import { PeliculasController } from './peliculas.controller';
 import { PersonaModule } from '../persona/persona.module';
 import { ConfigModule } from '@nestjs/config';
+import { FilesController } from './files.controller';
+import { FilesService } from './files.service';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { ConfigModule } from '@nestjs/config';
     PersonaModule,
     ConfigModule
   ],
-  controllers: [ReservasController, PeliculasController],
-  providers: [ReservasService, ReservasRepository],
+  controllers: [ReservasController, PeliculasController, FilesController],
+  providers: [ReservasService, ReservasRepository, FilesService],
 })
 export class ReservasModule {}

@@ -6,7 +6,7 @@ import { RolUsuario } from './rol-usuario.entity';
 export class Rol{
 
     @PrimaryGeneratedColumn({name: 'id_rol'})
-    idRol!: number;
+    id!: number;
 
     @Column({name: 'rol'})
     rol!: string;

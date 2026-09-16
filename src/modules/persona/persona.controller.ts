@@ -41,7 +41,7 @@ export class PersonaController {
   @ApiOperation({
     summary: 'Registrar persona',
     description:
-      'Crea la persona, su usuario y cliente. Requiere rol ADMIN o GERENTE.',
+      'Crea la persona, su usuario y cliente. Endpoint publico. Usa el rol enviado o el identificador 3 por defecto.',
   })
   @ApiBody({ type: CreatePersonaDto })
   @ApiSuccessResponse(PersonaCreadaDto, 'Persona Registrada correctamente', 201)
@@ -58,9 +58,19 @@ export class PersonaController {
     return ResponseUtils.success(persona, 'Persona Registrada correctamente');
   }
 
+  @ApiOperation({
+    summary: 'Registrar persona con rol de gerente',
+    description:
+      'Crea la persona, su usuario y cliente, asignando siempre el rol con identificador 2. Requiere rol ADMIN o GERENTE.',
+  })
+  @ApiBody({ type: CreatePersonaDto })
+  @ApiSuccessResponse(PersonaCreadaDto, 'Persona Registrada correctamente', 201)
+  @ApiBadRequestResponse({
+    description: 'Datos invalidos o rol con identificador 2 no encontrado.',
+  })
   @Post('gerente')
   @Auth(RolEnum.ADMIN, RolEnum.GERENTE)
-  @HandleException('Error al registrar al tecnico')
+  @HandleException('Error al registrar al gerente')
   async crearPersonaRol(
     @Body() dataDto: CreatePersonaDto,
   ): Promise<SuccessResponse<Partial<Persona>>> {
@@ -75,7 +85,7 @@ export class PersonaController {
 
   @ApiOperation({
     summary: 'Listar personas',
-    description: 'Devuelve personas paginadas. Requiere rol ADMIN.',
+    description: 'Devuelve personas paginadas. Requiere rol ADMIN o GERENTE.',
   })
   @ApiSuccessResponse(
     PersonaRespuestaDto,
@@ -104,7 +114,7 @@ export class PersonaController {
   @ApiOperation({
     summary: 'Obtener persona por ID',
     description:
-      'Devuelve directamente la persona. Requiere rol ADMIN o GERENTE.',
+      'Devuelve directamente la persona. Endpoint publico.',
   })
   @ApiParam({
     name: 'id',
