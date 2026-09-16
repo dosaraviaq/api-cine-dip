@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reserva } from './entities/reserva.entity';
-import { QueryRunner, Repository } from 'typeorm';
+import { In, QueryRunner, Repository } from 'typeorm';
 import { Funcion } from './entities/funcion.entity';
 import { Pelicula } from './entities/pelicula.entity';
 import { Asiento } from './entities/asiento.entity';
@@ -23,6 +23,34 @@ export class ReservasRepository {
     @InjectRepository(Sala)
     private readonly salaRepository: Repository<Sala>,
   ) {}
+
+  async validarAsientosReserva(idFuncion: number, ids: number[], queryRunner: QueryRunner): Promise<void> {
+    if (!ids.length || new Set(ids).size !== ids.length) {
+      throw new BadRequestException('Debe seleccionar asientos sin repetir');
+    }
+    // Serializa las reservas de la misma funcion hasta finalizar la transaccion.
+    const funcion = await queryRunner.manager.findOne(Funcion, {
+      where: { id: idFuncion }, lock: { mode: 'pessimistic_write' },
+    });
+    if (!funcion) throw new NotFoundException('No se encontro la funcion');
+    const sala = await queryRunner.manager.findOneBy(Sala, { id: funcion.idSala });
+    if (!sala?.activa || funcion.estado.toUpperCase() === 'CANCELADA') {
+      throw new BadRequestException('La funcion o la sala no esta disponible');
+    }
+    const asientos = await queryRunner.manager.findBy(Asiento, {
+      idAsiento: In(ids), idSala: funcion.idSala, activo: true,
+    });
+    if (asientos.length !== ids.length) {
+      throw new BadRequestException('Los asientos deben estar activos y pertenecer a la sala de la funcion');
+    }
+    const ocupados = await queryRunner.manager.createQueryBuilder(DetalleReserva, 'dr')
+      .innerJoin('dr.reserva', 'r')
+      .where('r.idFuncion = :idFuncion', { idFuncion })
+      .andWhere('r.estado <> :cancelada', { cancelada: 'CANCELADA' })
+      .andWhere('dr.idAsiento IN (:...ids)', { ids })
+      .getExists();
+    if (ocupados) throw new ConflictException('Uno o mas asientos ya estan reservados para esta funcion');
+  }
 
   async crearPelicula(
     data: Partial<Pelicula>,

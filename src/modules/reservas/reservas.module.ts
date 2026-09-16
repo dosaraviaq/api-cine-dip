@@ -15,6 +15,9 @@ import { PersonaModule } from '../persona/persona.module';
 import { ConfigModule } from '@nestjs/config';
 import { FilesController } from './files.controller';
 import { FilesService } from './files.service';
+import { CarteleraController } from './cartelera.controller';
+import { CarteleraService } from './cartelera.service';
+import { CarteleraRepository } from './cartelera.repository';
 
 @Module({
   imports: [
@@ -30,7 +33,7 @@ import { FilesService } from './files.service';
     PersonaModule,
     ConfigModule
   ],
-  controllers: [ReservasController, PeliculasController, FilesController],
-  providers: [ReservasService, ReservasRepository, FilesService],
+  controllers: [ReservasController, PeliculasController, FilesController, CarteleraController],
+  providers: [ReservasService, ReservasRepository, FilesService, CarteleraService, CarteleraRepository],
 })
 export class ReservasModule {}

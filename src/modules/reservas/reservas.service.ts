@@ -86,6 +86,11 @@ export class ReservasService {
     await queryRunner.startTransaction();
     try {
       const { detalles, ...datosReserva } = dataDto;
+      await this.reservaRepository.validarAsientosReserva(
+        datosReserva.idFuncion,
+        detalles.map((detalle) => detalle.idAsiento),
+        queryRunner,
+      );
       const reserva = await this.reservaRepository.crearReserva(
         {
           idCliente: datosReserva.idCliente,

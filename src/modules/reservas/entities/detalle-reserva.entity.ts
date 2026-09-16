@@ -4,7 +4,7 @@ import { Asiento } from './asiento.entity';
 
 @Entity({schema:'ventas', name:'detalle_reserva'})
 export class DetalleReserva{
-    @PrimaryGeneratedColumn({name:'id_detalle_persona'})
+    @PrimaryGeneratedColumn({name:'id_detalle_reserva'})
     id!: number;
 
     @Column({name:'id_reserva'})

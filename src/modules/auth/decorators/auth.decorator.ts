@@ -1,5 +1,6 @@
 import {
   ApiBearerAuth,
+  ApiExtension,
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
@@ -11,6 +12,7 @@ import { RolesGuard } from '../guards/roles.guard';
 export function Auth(...roles: RolEnum[]) {
   return applyDecorators(
     ApiBearerAuth(),
+    ApiExtension('x-roles', roles),
     ApiUnauthorizedResponse({
       description: 'Token JWT ausente, inválido o vencido.',
     }),

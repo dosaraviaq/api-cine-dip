@@ -3,6 +3,8 @@ import {
   ApiOperation,
   ApiBody,
   ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
@@ -32,6 +34,8 @@ export class ReservasController {
       'Registra la reserva y los detalles de sus asientos en una transacción.',
   })
   @ApiBody({ type: CrearReservaDto })
+  @ApiNotFoundResponse({ description: 'No se encontro la funcion.' })
+  @ApiConflictResponse({ description: 'Uno o mas asientos ya estan reservados para esta funcion.' })
   @ApiSuccessResponse(
     ResultadoReservaDto,
     'Reserva registrada correctamente',

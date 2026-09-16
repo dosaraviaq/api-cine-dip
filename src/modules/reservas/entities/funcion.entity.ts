@@ -15,16 +15,16 @@ export class Funcion {
     @Column({name:'id_sala'})
     idSala!: number;
     
-    @Column({name:'fecha'})
-    fecha!: Date;
+    @Column({name:'fecha', type: 'date'})
+    fecha!: string;
 
-    @Column({name:'hora_inicio'})
-    horaInicio!: Date;
+    @Column({name:'hora_inicio', type: 'time'})
+    horaInicio!: string;
 
-    @Column({name:'hora_fin'})
-    horaFin!: Date;
+    @Column({name:'hora_fin', type: 'time'})
+    horaFin!: string;
 
-    @Column({name:'precio'})
+    @Column({name:'precio', type: 'numeric', precision: 10, scale: 2})
     precio!: number;
 
     @Column({name:'estado'})
