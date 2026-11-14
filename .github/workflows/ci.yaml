@@ -1,0 +1,9 @@
+name: CI api cine
+
+on:
+  push:
+    branches: [master]
+
+env:
+  IMAGEN: ${{ secrets.DOCKER_USERNAME }}/api-cine:${{ github.sha }}
+  # mi-usuario/api-cine:caracteres
